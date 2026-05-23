@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reservas · Jorge</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #111; line-height: 1.4; }
+    .container { max-width: 640px; margin: 0 auto; padding: 0 16px 32px; }
+    header { background: #14B8A6; color: white; padding: 32px 16px; text-align: center; }
+    header h1 { font-size: 1.6em; margin-bottom: 6px; }
+    header p { opacity: 0.9; font-size: 0.95em; }
+    h2 { font-size: 1.05em; margin: 24px 0 10px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .service { display: flex; align-items: center; gap: 12px; }
+    .service-info { flex: 1; min-width: 0; }
+    .service-name { font-weight: 600; font-size: 1.05em; }
+    .service-meta { color: #666; font-size: 0.88em; margin-top: 2px; }
+    .service-price { font-weight: 600; color: #14B8A6; }
+    .btn { display: inline-block; background: #25D366; color: white; padding: 9px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9em; text-align: center; cursor: pointer; border: none; }
+    .btn-full { display: block; width: 100%; margin-top: 12px; }
+    .day-group { background: white; border-radius: 12px; padding: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .day-title { font-weight: 600; font-size: 0.95em; margin-bottom: 8px; text-transform: capitalize; color: #333; }
+    .slot-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+    .slot-btn { background: #f1f5f9; color: #0f172a; padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.88em; cursor: pointer; font-family: inherit; }
+    .slot-btn:hover { background: #14B8A6; color: white; border-color: #14B8A6; }
+    .service-picker { background: white; border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 5; }
+    .service-picker label { font-size: 0.85em; color: #666; display: block; margin-bottom: 4px; }
+    .service-picker select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95em; }
+    .schedule { font-size: 0.95em; }
+    .schedule-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; }
+    .schedule-row:last-child { border-bottom: none; }
+    .schedule-day { font-weight: 500; }
+    .schedule-hours { color: #555; font-variant-numeric: tabular-nums; }
+    .schedule-closed { color: #999; font-style: italic; }
+    .empty { color: #888; text-align: center; padding: 18px; }
+    .stale { background: #fef3c7; color: #92400e; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 0.88em; }
+    footer { margin-top: 24px; padding: 16px; text-align: center; font-size: 0.82em; color: #888; }
+    .meta { display: flex; flex-direction: column; gap: 4px; }
+    .meta-item { font-size: 0.9em; color: #555; }
+</style></head>
+<body>
+<header><h1>Jorge</h1><p>Reserva tu cita por WhatsApp en un click</p></header>
+<div class="container">
+<div id="stale-banner" style="display:none;" class="stale">Esta agenda puede no estar al día. Confirma disponibilidad por WhatsApp.</div>
+<h2>Servicios</h2>
+<div id="services-list"></div>
+<h2>Próximos huecos</h2>
+<div id="slots-list"></div>
+<div id="no-slots" style="display:none;" class="card empty">
+No hay huecos disponibles en los próximos 14 días. <a href="https://wa.me/34638896025?text=Hola%2C+quiero+pedir+cita+en+Jorge" class="btn btn-full">Pídela por WhatsApp</a></div>
+<h2>Horario</h2>
+<div class="card schedule">
+<div class="schedule-row"><span class="schedule-day">Lunes</span><span class="schedule-hours">09:00–14:00 · 16:00–19:00</span></div>
+<div class="schedule-row"><span class="schedule-day">Martes</span><span class="schedule-hours">09:00–14:00 · 16:00–19:00</span></div>
+<div class="schedule-row"><span class="schedule-day">Miércoles</span><span class="schedule-hours">09:00–14:00 · 16:00–19:00</span></div>
+<div class="schedule-row"><span class="schedule-day">Jueves</span><span class="schedule-hours">09:00–14:00 · 16:00–19:00</span></div>
+<div class="schedule-row"><span class="schedule-day">Viernes</span><span class="schedule-hours">09:00–14:00 · 16:00–19:00</span></div>
+<div class="schedule-row"><span class="schedule-day">Sábado</span><span class="schedule-hours schedule-closed">Cerrado</span></div>
+<div class="schedule-row"><span class="schedule-day">Domingo</span><span class="schedule-hours schedule-closed">Cerrado</span></div>
+</div>
+<h2>Contacto</h2>
+<div class="card">
+<div class="meta">
+<div class="meta-item">📱 WhatsApp: <a href="https://wa.me/34638896025?text=Hola%2C+una+pregunta+sobre+Jorge" style="color:#14B8A6;text-decoration:none;">+34638896025</a></div>
+</div>
+</div>
+<footer>Página generada con Mint CRM · 23 mayo 2026 19:18</footer>
+</div>
+
+<script>
+(function() {
+    var SERVICES = [{"id":8,"name":"Catering evento (por persona)","price":"35,00 €","duration":0},{"id":1,"name":"Corte de pelo","price":"18,00 €","duration":0},{"id":5,"name":"Depilación piernas","price":"25,00 €","duration":0},{"id":4,"name":"Manicura","price":"18,00 €","duration":0},{"id":3,"name":"Mechas","price":"55,00 €","duration":0},{"id":10,"name":"prueba","price":"15,00 €","duration":60},{"id":2,"name":"Tinte completo","price":"35,00 €","duration":0}];
+    var SLOTS = [{"ms":1779692400000,"dur":30,"day":"lunes 25 mayo","time":"09:00","date":"2026-05-25"},{"ms":1779694200000,"dur":30,"day":"lunes 25 mayo","time":"09:30","date":"2026-05-25"},{"ms":1779696000000,"dur":30,"day":"lunes 25 mayo","time":"10:00","date":"2026-05-25"},{"ms":1779697800000,"dur":30,"day":"lunes 25 mayo","time":"10:30","date":"2026-05-25"},{"ms":1779699600000,"dur":30,"day":"lunes 25 mayo","time":"11:00","date":"2026-05-25"},{"ms":1779701400000,"dur":30,"day":"lunes 25 mayo","time":"11:30","date":"2026-05-25"},{"ms":1779703200000,"dur":30,"day":"lunes 25 mayo","time":"12:00","date":"2026-05-25"},{"ms":1779705000000,"dur":30,"day":"lunes 25 mayo","time":"12:30","date":"2026-05-25"},{"ms":1779706800000,"dur":30,"day":"lunes 25 mayo","time":"13:00","date":"2026-05-25"},{"ms":1779708600000,"dur":30,"day":"lunes 25 mayo","time":"13:30","date":"2026-05-25"},{"ms":1779717600000,"dur":30,"day":"lunes 25 mayo","time":"16:00","date":"2026-05-25"},{"ms":1779719400000,"dur":30,"day":"lunes 25 mayo","time":"16:30","date":"2026-05-25"},{"ms":1779721200000,"dur":30,"day":"lunes 25 mayo","time":"17:00","date":"2026-05-25"},{"ms":1779723000000,"dur":30,"day":"lunes 25 mayo","time":"17:30","date":"2026-05-25"},{"ms":1779724800000,"dur":30,"day":"lunes 25 mayo","time":"18:00","date":"2026-05-25"},{"ms":1779726600000,"dur":30,"day":"lunes 25 mayo","time":"18:30","date":"2026-05-25"},{"ms":1779778800000,"dur":30,"day":"martes 26 mayo","time":"09:00","date":"2026-05-26"},{"ms":1779780600000,"dur":30,"day":"martes 26 mayo","time":"09:30","date":"2026-05-26"},{"ms":1779782400000,"dur":30,"day":"martes 26 mayo","time":"10:00","date":"2026-05-26"},{"ms":1779784200000,"dur":30,"day":"martes 26 mayo","time":"10:30","date":"2026-05-26"},{"ms":1779786000000,"dur":30,"day":"martes 26 mayo","time":"11:00","date":"2026-05-26"},{"ms":1779787800000,"dur":30,"day":"martes 26 mayo","time":"11:30","date":"2026-05-26"},{"ms":1779789600000,"dur":30,"day":"martes 26 mayo","time":"12:00","date":"2026-05-26"},{"ms":1779791400000,"dur":30,"day":"martes 26 mayo","time":"12:30","date":"2026-05-26"},{"ms":1779793200000,"dur":30,"day":"martes 26 mayo","time":"13:00","date":"2026-05-26"},{"ms":1779795000000,"dur":30,"day":"martes 26 mayo","time":"13:30","date":"2026-05-26"},{"ms":1779804000000,"dur":30,"day":"martes 26 mayo","time":"16:00","date":"2026-05-26"},{"ms":1779805800000,"dur":30,"day":"martes 26 mayo","time":"16:30","date":"2026-05-26"},{"ms":1779807600000,"dur":30,"day":"martes 26 mayo","time":"17:00","date":"2026-05-26"},{"ms":1779809400000,"dur":30,"day":"martes 26 mayo","time":"17:30","date":"2026-05-26"},{"ms":1779811200000,"dur":30,"day":"martes 26 mayo","time":"18:00","date":"2026-05-26"},{"ms":1779813000000,"dur":30,"day":"martes 26 mayo","time":"18:30","date":"2026-05-26"},{"ms":1779865200000,"dur":30,"day":"miércoles 27 mayo","time":"09:00","date":"2026-05-27"},{"ms":1779867000000,"dur":30,"day":"miércoles 27 mayo","time":"09:30","date":"2026-05-27"},{"ms":1779868800000,"dur":30,"day":"miércoles 27 mayo","time":"10:00","date":"2026-05-27"},{"ms":1779870600000,"dur":30,"day":"miércoles 27 mayo","time":"10:30","date":"2026-05-27"},{"ms":1779872400000,"dur":30,"day":"miércoles 27 mayo","time":"11:00","date":"2026-05-27"},{"ms":1779874200000,"dur":30,"day":"miércoles 27 mayo","time":"11:30","date":"2026-05-27"},{"ms":1779876000000,"dur":30,"day":"miércoles 27 mayo","time":"12:00","date":"2026-05-27"},{"ms":1779877800000,"dur":30,"day":"miércoles 27 mayo","time":"12:30","date":"2026-05-27"},{"ms":1779879600000,"dur":30,"day":"miércoles 27 mayo","time":"13:00","date":"2026-05-27"},{"ms":1779881400000,"dur":30,"day":"miércoles 27 mayo","time":"13:30","date":"2026-05-27"},{"ms":1779890400000,"dur":30,"day":"miércoles 27 mayo","time":"16:00","date":"2026-05-27"},{"ms":1779892200000,"dur":30,"day":"miércoles 27 mayo","time":"16:30","date":"2026-05-27"},{"ms":1779894000000,"dur":30,"day":"miércoles 27 mayo","time":"17:00","date":"2026-05-27"},{"ms":1779895800000,"dur":30,"day":"miércoles 27 mayo","time":"17:30","date":"2026-05-27"},{"ms":1779897600000,"dur":30,"day":"miércoles 27 mayo","time":"18:00","date":"2026-05-27"},{"ms":1779899400000,"dur":30,"day":"miércoles 27 mayo","time":"18:30","date":"2026-05-27"},{"ms":1779951600000,"dur":30,"day":"jueves 28 mayo","time":"09:00","date":"2026-05-28"},{"ms":1779953400000,"dur":30,"day":"jueves 28 mayo","time":"09:30","date":"2026-05-28"},{"ms":1779955200000,"dur":30,"day":"jueves 28 mayo","time":"10:00","date":"2026-05-28"},{"ms":1779957000000,"dur":30,"day":"jueves 28 mayo","time":"10:30","date":"2026-05-28"},{"ms":1779958800000,"dur":30,"day":"jueves 28 mayo","time":"11:00","date":"2026-05-28"},{"ms":1779960600000,"dur":30,"day":"jueves 28 mayo","time":"11:30","date":"2026-05-28"},{"ms":1779962400000,"dur":30,"day":"jueves 28 mayo","time":"12:00","date":"2026-05-28"},{"ms":1779964200000,"dur":30,"day":"jueves 28 mayo","time":"12:30","date":"2026-05-28"},{"ms":1779966000000,"dur":30,"day":"jueves 28 mayo","time":"13:00","date":"2026-05-28"},{"ms":1779967800000,"dur":30,"day":"jueves 28 mayo","time":"13:30","date":"2026-05-28"},{"ms":1779976800000,"dur":30,"day":"jueves 28 mayo","time":"16:00","date":"2026-05-28"},{"ms":1779978600000,"dur":30,"day":"jueves 28 mayo","time":"16:30","date":"2026-05-28"},{"ms":1779980400000,"dur":30,"day":"jueves 28 mayo","time":"17:00","date":"2026-05-28"},{"ms":1779982200000,"dur":30,"day":"jueves 28 mayo","time":"17:30","date":"2026-05-28"},{"ms":1779984000000,"dur":30,"day":"jueves 28 mayo","time":"18:00","date":"2026-05-28"},{"ms":1779985800000,"dur":30,"day":"jueves 28 mayo","time":"18:30","date":"2026-05-28"},{"ms":1780038000000,"dur":30,"day":"viernes 29 mayo","time":"09:00","date":"2026-05-29"},{"ms":1780039800000,"dur":30,"day":"viernes 29 mayo","time":"09:30","date":"2026-05-29"},{"ms":1780041600000,"dur":30,"day":"viernes 29 mayo","time":"10:00","date":"2026-05-29"},{"ms":1780043400000,"dur":30,"day":"viernes 29 mayo","time":"10:30","date":"2026-05-29"},{"ms":1780045200000,"dur":30,"day":"viernes 29 mayo","time":"11:00","date":"2026-05-29"},{"ms":1780047000000,"dur":30,"day":"viernes 29 mayo","time":"11:30","date":"2026-05-29"},{"ms":1780048800000,"dur":30,"day":"viernes 29 mayo","time":"12:00","date":"2026-05-29"},{"ms":1780050600000,"dur":30,"day":"viernes 29 mayo","time":"12:30","date":"2026-05-29"},{"ms":1780052400000,"dur":30,"day":"viernes 29 mayo","time":"13:00","date":"2026-05-29"},{"ms":1780054200000,"dur":30,"day":"viernes 29 mayo","time":"13:30","date":"2026-05-29"},{"ms":1780063200000,"dur":30,"day":"viernes 29 mayo","time":"16:00","date":"2026-05-29"},{"ms":1780065000000,"dur":30,"day":"viernes 29 mayo","time":"16:30","date":"2026-05-29"},{"ms":1780066800000,"dur":30,"day":"viernes 29 mayo","time":"17:00","date":"2026-05-29"},{"ms":1780068600000,"dur":30,"day":"viernes 29 mayo","time":"17:30","date":"2026-05-29"},{"ms":1780070400000,"dur":30,"day":"viernes 29 mayo","time":"18:00","date":"2026-05-29"},{"ms":1780072200000,"dur":30,"day":"viernes 29 mayo","time":"18:30","date":"2026-05-29"},{"ms":1780297200000,"dur":30,"day":"lunes 1 junio","time":"09:00","date":"2026-06-01"},{"ms":1780299000000,"dur":30,"day":"lunes 1 junio","time":"09:30","date":"2026-06-01"},{"ms":1780300800000,"dur":30,"day":"lunes 1 junio","time":"10:00","date":"2026-06-01"},{"ms":1780302600000,"dur":30,"day":"lunes 1 junio","time":"10:30","date":"2026-06-01"},{"ms":1780304400000,"dur":30,"day":"lunes 1 junio","time":"11:00","date":"2026-06-01"},{"ms":1780306200000,"dur":30,"day":"lunes 1 junio","time":"11:30","date":"2026-06-01"},{"ms":1780308000000,"dur":30,"day":"lunes 1 junio","time":"12:00","date":"2026-06-01"},{"ms":1780309800000,"dur":30,"day":"lunes 1 junio","time":"12:30","date":"2026-06-01"},{"ms":1780311600000,"dur":30,"day":"lunes 1 junio","time":"13:00","date":"2026-06-01"},{"ms":1780313400000,"dur":30,"day":"lunes 1 junio","time":"13:30","date":"2026-06-01"},{"ms":1780322400000,"dur":30,"day":"lunes 1 junio","time":"16:00","date":"2026-06-01"},{"ms":1780324200000,"dur":30,"day":"lunes 1 junio","time":"16:30","date":"2026-06-01"},{"ms":1780326000000,"dur":30,"day":"lunes 1 junio","time":"17:00","date":"2026-06-01"},{"ms":1780327800000,"dur":30,"day":"lunes 1 junio","time":"17:30","date":"2026-06-01"},{"ms":1780329600000,"dur":30,"day":"lunes 1 junio","time":"18:00","date":"2026-06-01"},{"ms":1780331400000,"dur":30,"day":"lunes 1 junio","time":"18:30","date":"2026-06-01"},{"ms":1780383600000,"dur":30,"day":"martes 2 junio","time":"09:00","date":"2026-06-02"},{"ms":1780385400000,"dur":30,"day":"martes 2 junio","time":"09:30","date":"2026-06-02"},{"ms":1780387200000,"dur":30,"day":"martes 2 junio","time":"10:00","date":"2026-06-02"},{"ms":1780389000000,"dur":30,"day":"martes 2 junio","time":"10:30","date":"2026-06-02"},{"ms":1780390800000,"dur":30,"day":"martes 2 junio","time":"11:00","date":"2026-06-02"},{"ms":1780392600000,"dur":30,"day":"martes 2 junio","time":"11:30","date":"2026-06-02"},{"ms":1780394400000,"dur":30,"day":"martes 2 junio","time":"12:00","date":"2026-06-02"},{"ms":1780396200000,"dur":30,"day":"martes 2 junio","time":"12:30","date":"2026-06-02"},{"ms":1780398000000,"dur":30,"day":"martes 2 junio","time":"13:00","date":"2026-06-02"},{"ms":1780399800000,"dur":30,"day":"martes 2 junio","time":"13:30","date":"2026-06-02"},{"ms":1780408800000,"dur":30,"day":"martes 2 junio","time":"16:00","date":"2026-06-02"},{"ms":1780410600000,"dur":30,"day":"martes 2 junio","time":"16:30","date":"2026-06-02"},{"ms":1780412400000,"dur":30,"day":"martes 2 junio","time":"17:00","date":"2026-06-02"},{"ms":1780414200000,"dur":30,"day":"martes 2 junio","time":"17:30","date":"2026-06-02"},{"ms":1780416000000,"dur":30,"day":"martes 2 junio","time":"18:00","date":"2026-06-02"},{"ms":1780417800000,"dur":30,"day":"martes 2 junio","time":"18:30","date":"2026-06-02"},{"ms":1780470000000,"dur":30,"day":"miércoles 3 junio","time":"09:00","date":"2026-06-03"},{"ms":1780471800000,"dur":30,"day":"miércoles 3 junio","time":"09:30","date":"2026-06-03"},{"ms":1780473600000,"dur":30,"day":"miércoles 3 junio","time":"10:00","date":"2026-06-03"},{"ms":1780475400000,"dur":30,"day":"miércoles 3 junio","time":"10:30","date":"2026-06-03"},{"ms":1780477200000,"dur":30,"day":"miércoles 3 junio","time":"11:00","date":"2026-06-03"},{"ms":1780479000000,"dur":30,"day":"miércoles 3 junio","time":"11:30","date":"2026-06-03"},{"ms":1780480800000,"dur":30,"day":"miércoles 3 junio","time":"12:00","date":"2026-06-03"},{"ms":1780482600000,"dur":30,"day":"miércoles 3 junio","time":"12:30","date":"2026-06-03"},{"ms":1780484400000,"dur":30,"day":"miércoles 3 junio","time":"13:00","date":"2026-06-03"},{"ms":1780486200000,"dur":30,"day":"miércoles 3 junio","time":"13:30","date":"2026-06-03"},{"ms":1780495200000,"dur":30,"day":"miércoles 3 junio","time":"16:00","date":"2026-06-03"},{"ms":1780497000000,"dur":30,"day":"miércoles 3 junio","time":"16:30","date":"2026-06-03"},{"ms":1780498800000,"dur":30,"day":"miércoles 3 junio","time":"17:00","date":"2026-06-03"},{"ms":1780500600000,"dur":30,"day":"miércoles 3 junio","time":"17:30","date":"2026-06-03"},{"ms":1780502400000,"dur":30,"day":"miércoles 3 junio","time":"18:00","date":"2026-06-03"},{"ms":1780504200000,"dur":30,"day":"miércoles 3 junio","time":"18:30","date":"2026-06-03"},{"ms":1780556400000,"dur":30,"day":"jueves 4 junio","time":"09:00","date":"2026-06-04"},{"ms":1780558200000,"dur":30,"day":"jueves 4 junio","time":"09:30","date":"2026-06-04"},{"ms":1780560000000,"dur":30,"day":"jueves 4 junio","time":"10:00","date":"2026-06-04"},{"ms":1780561800000,"dur":30,"day":"jueves 4 junio","time":"10:30","date":"2026-06-04"},{"ms":1780563600000,"dur":30,"day":"jueves 4 junio","time":"11:00","date":"2026-06-04"},{"ms":1780565400000,"dur":30,"day":"jueves 4 junio","time":"11:30","date":"2026-06-04"},{"ms":1780567200000,"dur":30,"day":"jueves 4 junio","time":"12:00","date":"2026-06-04"},{"ms":1780569000000,"dur":30,"day":"jueves 4 junio","time":"12:30","date":"2026-06-04"},{"ms":1780570800000,"dur":30,"day":"jueves 4 junio","time":"13:00","date":"2026-06-04"},{"ms":1780572600000,"dur":30,"day":"jueves 4 junio","time":"13:30","date":"2026-06-04"},{"ms":1780581600000,"dur":30,"day":"jueves 4 junio","time":"16:00","date":"2026-06-04"},{"ms":1780583400000,"dur":30,"day":"jueves 4 junio","time":"16:30","date":"2026-06-04"},{"ms":1780585200000,"dur":30,"day":"jueves 4 junio","time":"17:00","date":"2026-06-04"},{"ms":1780587000000,"dur":30,"day":"jueves 4 junio","time":"17:30","date":"2026-06-04"},{"ms":1780588800000,"dur":30,"day":"jueves 4 junio","time":"18:00","date":"2026-06-04"},{"ms":1780590600000,"dur":30,"day":"jueves 4 junio","time":"18:30","date":"2026-06-04"},{"ms":1780642800000,"dur":30,"day":"viernes 5 junio","time":"09:00","date":"2026-06-05"},{"ms":1780644600000,"dur":30,"day":"viernes 5 junio","time":"09:30","date":"2026-06-05"},{"ms":1780646400000,"dur":30,"day":"viernes 5 junio","time":"10:00","date":"2026-06-05"},{"ms":1780648200000,"dur":30,"day":"viernes 5 junio","time":"10:30","date":"2026-06-05"},{"ms":1780650000000,"dur":30,"day":"viernes 5 junio","time":"11:00","date":"2026-06-05"},{"ms":1780651800000,"dur":30,"day":"viernes 5 junio","time":"11:30","date":"2026-06-05"},{"ms":1780653600000,"dur":30,"day":"viernes 5 junio","time":"12:00","date":"2026-06-05"},{"ms":1780655400000,"dur":30,"day":"viernes 5 junio","time":"12:30","date":"2026-06-05"},{"ms":1780657200000,"dur":30,"day":"viernes 5 junio","time":"13:00","date":"2026-06-05"},{"ms":1780659000000,"dur":30,"day":"viernes 5 junio","time":"13:30","date":"2026-06-05"},{"ms":1780668000000,"dur":30,"day":"viernes 5 junio","time":"16:00","date":"2026-06-05"},{"ms":1780669800000,"dur":30,"day":"viernes 5 junio","time":"16:30","date":"2026-06-05"},{"ms":1780671600000,"dur":30,"day":"viernes 5 junio","time":"17:00","date":"2026-06-05"},{"ms":1780673400000,"dur":30,"day":"viernes 5 junio","time":"17:30","date":"2026-06-05"},{"ms":1780675200000,"dur":30,"day":"viernes 5 junio","time":"18:00","date":"2026-06-05"},{"ms":1780677000000,"dur":30,"day":"viernes 5 junio","time":"18:30","date":"2026-06-05"}];
+    var CFG = {"phone":"34638896025","template":"Hola, quiero reservar {servicio} el {dia} a las {hora}.","generatedAt":1779556732796,"staleMs":86400000,"markerId":"im4qykmv1"};
+
+    function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function waLink(text) {
+        return 'https://wa.me/' + CFG.phone + '?text=' + encodeURIComponent(text);
+    }
+    function fillTemplate(svc, day, time) {
+        // v2.13.4 — Añadimos el marcador [MINT-RESERVA #xxx] al final
+        // del mensaje. El cliente lo verá como un código (le decimos
+        // "no lo borres" en futuras iteraciones si hace falta), pero
+        // su función es que el móvil del autónomo lo detecte vía el
+        // WhatsAppListener y CREE LA RESERVA AUTOMÁTICAMENTE en Mint.
+        var msg = CFG.template.replace(/\{servicio\}/g, svc)
+            .replace(/\{dia\}/g, day)
+            .replace(/\{hora\}/g, time);
+        return msg + "\n\n[MINT-RESERVA #" + CFG.markerId + "]";
+    }
+
+    // ---------- Servicios ----------
+    var sList = document.getElementById('services-list');
+    if (sList && SERVICES.length > 0) {
+        SERVICES.forEach(function(s) {
+            var card = document.createElement('div');
+            card.className = 'card service';
+            var info = document.createElement('div');
+            info.className = 'service-info';
+            var name = document.createElement('div');
+            name.className = 'service-name';
+            name.textContent = s.name;
+            var meta = document.createElement('div');
+            meta.className = 'service-meta';
+            var duration = s.duration > 0 ? s.duration + ' min · ' : '';
+            meta.innerHTML = duration + '<span class="service-price">' + escapeHtml(s.price) + '</span>';
+            info.appendChild(name); info.appendChild(meta);
+            card.appendChild(info);
+            sList.appendChild(card);
+        });
+    }
+
+    // ---------- Slots ----------
+    // Re-filtrar slots pasados según la HORA REAL del cliente (no la del
+    // momento de generación). Esto es lo que hace la página "inteligente":
+    // aunque el HTML lleve 6 horas en Drive, los slots que ya pasaron se
+    // ocultan automáticamente cuando el cliente la abre.
+    var now = Date.now();
+    var STALE = (now - CFG.generatedAt) > CFG.staleMs;
+    if (STALE) {
+        document.getElementById('stale-banner').style.display = 'block';
+    }
+
+    var futureSlots = SLOTS.filter(function(slot) {
+        return slot.ms - now > 60000; // mínimo 1 min al futuro
+    });
+
+    // Default service: el primero. El usuario puede cambiarlo para
+    // personalizar el mensaje WhatsApp del slot que toque.
+    var selectedService = SERVICES.length > 0 ? SERVICES[0] : { name: 'cita', duration: 0 };
+
+    var slotsList = document.getElementById('slots-list');
+    var noSlots = document.getElementById('no-slots');
+
+    function renderSlots() {
+        slotsList.innerHTML = '';
+        if (futureSlots.length === 0) {
+            noSlots.style.display = 'block';
+            return;
+        }
+        noSlots.style.display = 'none';
+
+        // Selector de servicio arriba si hay >= 2
+        if (SERVICES.length >= 2) {
+            var picker = document.createElement('div');
+            picker.className = 'service-picker';
+            picker.innerHTML = '<label>Servicio que quieres reservar</label>' +
+                '<select id="svc-select"></select>';
+            slotsList.appendChild(picker);
+            var sel = picker.querySelector('#svc-select');
+            SERVICES.forEach(function(s, idx) {
+                var opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = s.name + ' (' + s.price + ')';
+                sel.appendChild(opt);
+            });
+            sel.addEventListener('change', function(e) {
+                selectedService = SERVICES[parseInt(e.target.value)];
+            });
+        }
+
+        // Agrupar por día
+        var byDay = {};
+        futureSlots.forEach(function(slot) {
+            (byDay[slot.day] = byDay[slot.day] || []).push(slot);
+        });
+
+        Object.keys(byDay).forEach(function(day) {
+            var group = document.createElement('div');
+            group.className = 'day-group';
+            var title = document.createElement('div');
+            title.className = 'day-title';
+            title.textContent = day;
+            group.appendChild(title);
+            var grid = document.createElement('div');
+            grid.className = 'slot-grid';
+            byDay[day].forEach(function(slot) {
+                var btn = document.createElement('button');
+                btn.className = 'slot-btn';
+                btn.textContent = slot.time;
+                btn.addEventListener('click', function() {
+                    var msg = fillTemplate(selectedService.name, slot.day, slot.time);
+                    window.open(waLink(msg), '_blank');
+                });
+                grid.appendChild(btn);
+            });
+            group.appendChild(grid);
+            slotsList.appendChild(group);
+        });
+    }
+    renderSlots();
+})();
+</script>
+</body>
+</html>
